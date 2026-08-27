@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { ShieldCheck } from "lucide-react";
-import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,17 +22,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Splash() {
-  const { ready, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!ready) return;
-    const t = setTimeout(
-      () => navigate({ to: isAuthenticated ? "/home" : "/login", replace: true }),
-      600,
-    );
+    const t = setTimeout(() => navigate({ to: "/home", replace: true }), 400);
     return () => clearTimeout(t);
-  }, [ready, isAuthenticated, navigate]);
+  }, [navigate]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-primary px-6 text-center">

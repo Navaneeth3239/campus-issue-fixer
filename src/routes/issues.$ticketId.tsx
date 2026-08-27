@@ -14,7 +14,7 @@ import {
 } from "@/components/ui-kit";
 import { StatusTimeline } from "@/components/StatusTimeline";
 import { issueService } from "@/lib/services";
-import { getSocket } from "@/lib/socket";
+import { connectSocket } from "@/lib/socket";
 import type { Issue } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -46,10 +46,8 @@ function IssueDetailPage() {
   });
 
   useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
-    const room = `issue:${ticketId}`;
-    socket.emit("join", room);
+    let active = true;
+    let socket: Awaited<ReturnType<typeof connectSocket>> = null;
 
     const apply = (payload: Partial<Issue>) => {
       queryClient.setQueryData<Issue | null>(["issue", ticketId], (prev) =>
@@ -58,11 +56,20 @@ function IssueDetailPage() {
       void queryClient.invalidateQueries({ queryKey: ["issues"] });
     };
 
-    socket.on("issueStatusChanged", apply);
-    socket.on("issueUpdated", apply);
-    socket.on("issueResolved", apply);
+    void connectSocket().then((s) => {
+      if (!active || !s) return;
+      socket = s;
+      const room = `issue:${ticketId}`;
+      socket.emit("join", room);
+      socket.on("issueStatusChanged", apply);
+      socket.on("issueUpdated", apply);
+      socket.on("issueResolved", apply);
+    });
 
     return () => {
+      active = false;
+      if (!socket) return;
+      const room = `issue:${ticketId}`;
       socket.emit("leave", room);
       socket.off("issueStatusChanged", apply);
       socket.off("issueUpdated", apply);

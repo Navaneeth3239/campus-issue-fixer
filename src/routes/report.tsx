@@ -138,6 +138,7 @@ function ReportPage() {
         title: draft.title,
         category: draft.category,
         location: draft.location,
+        gps: draft.gps,
       });
       if (dup) {
         setDuplicate(dup);
@@ -161,9 +162,12 @@ function ReportPage() {
       form.append("category", draft.category);
       form.append("location", draft.location);
       form.append("priority", draft.priority);
-      if (draft.gps) form.append("gps", JSON.stringify(draft.gps));
-      files.forEach((f) => form.append("images", f));
-      if (videoFile) form.append("video", videoFile);
+      if (draft.gps) {
+        form.append("latitude", String(draft.gps.lat));
+        form.append("longitude", String(draft.gps.lng));
+      }
+      files.forEach((f) => form.append("media", f));
+      if (videoFile) form.append("media", videoFile);
 
       const issue = await issueService.create(form, {
         ...draft,

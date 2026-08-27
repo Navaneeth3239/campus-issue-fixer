@@ -1,5 +1,5 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { Bell, Home, ListChecks, PlusCircle, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -22,16 +22,11 @@ export function AppShell({
   children: ReactNode;
   back?: string;
 }) {
-  const { ready, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const { ready } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { unread } = useNotifications();
 
-  useEffect(() => {
-    if (ready && !isAuthenticated) navigate({ to: "/login", replace: true });
-  }, [ready, isAuthenticated, navigate]);
-
-  if (!ready || !isAuthenticated) {
+  if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
         Loading…

@@ -60,7 +60,11 @@ export const STATUS_FLOW = [
   "CLOSED",
 ] as const;
 
-export type IssueStatus = (typeof STATUS_FLOW)[number];
+/** Backend may also return these statuses outside the main student timeline. */
+export const EXTENDED_STATUSES = ["REOPENED", "OVERDUE", "ESCALATED"] as const;
+
+export type CoreIssueStatus = (typeof STATUS_FLOW)[number];
+export type IssueStatus = CoreIssueStatus | (typeof EXTENDED_STATUSES)[number];
 
 export const STATUS_LABELS: Record<IssueStatus, string> = {
   REPORTED: "Reported",
@@ -69,6 +73,9 @@ export const STATUS_LABELS: Record<IssueStatus, string> = {
   RESOLVED: "Resolved",
   VERIFIED: "Verified",
   CLOSED: "Closed",
+  REOPENED: "Reopened",
+  OVERDUE: "Overdue",
+  ESCALATED: "Escalated",
 };
 
 export const STATUS_STYLES: Record<IssueStatus, string> = {
@@ -78,4 +85,7 @@ export const STATUS_STYLES: Record<IssueStatus, string> = {
   RESOLVED: "bg-accent/20 text-accent-foreground border-accent/40",
   VERIFIED: "bg-success/15 text-success border-success/30",
   CLOSED: "bg-success/15 text-success border-success/30",
+  REOPENED: "bg-warning/15 text-warning border-warning/30",
+  OVERDUE: "bg-danger/15 text-danger border-danger/30",
+  ESCALATED: "bg-danger/15 text-danger border-danger/30",
 };

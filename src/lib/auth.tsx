@@ -4,6 +4,15 @@ import { USER_KEY, clearSession, getToken, setToken } from "./api";
 import { disconnectSocket } from "./socket";
 import type { User } from "./types";
 
+/** Set VITE_SKIP_AUTH=true to bypass login and use the app as a guest student. */
+export const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === "true";
+
+const GUEST_USER: User = {
+  id: "guest-student",
+  name: "Student",
+  email: "student@local",
+};
+
 interface AuthState {
   user: User | null;
   ready: boolean;
@@ -14,11 +23,29 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+const noop = () => undefined;
+
+const SSR_AUTH_FALLBACK: AuthState = {
+  user: null,
+  ready: false,
+  isAuthenticated: false,
+  signIn: noop,
+  signOut: noop,
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(SKIP_AUTH ? GUEST_USER : null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (SKIP_AUTH) {
+      setToken("guest.local");
+      window.localStorage.setItem(USER_KEY, JSON.stringify(GUEST_USER));
+      setUser(GUEST_USER);
+      setReady(true);
+      return;
+    }
+
     const token = getToken();
     const raw = window.localStorage.getItem(USER_KEY);
     if (token && raw) {
@@ -40,6 +67,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(() => {
     clearSession();
     disconnectSocket();
+    if (SKIP_AUTH) {
+      setToken("guest.local");
+      window.localStorage.setItem(USER_KEY, JSON.stringify(GUEST_USER));
+      setUser(GUEST_USER);
+      return;
+    }
     setUser(null);
   }, []);
 
@@ -51,8 +84,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth() {
+export function useAuth(): AuthState {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  if (!ctx) {
+    if (typeof window === "undefined") return SSR_AUTH_FALLBACK;
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
   return ctx;
 }

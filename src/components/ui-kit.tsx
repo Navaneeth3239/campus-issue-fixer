@@ -38,19 +38,24 @@ const statusIcon: Record<IssueStatus, typeof Circle> = {
   RESOLVED: AlertTriangle,
   VERIFIED: CheckCircle2,
   CLOSED: CheckCircle2,
+  REOPENED: Loader2,
+  OVERDUE: AlertTriangle,
+  ESCALATED: AlertTriangle,
 };
 
 export function StatusBadge({ status }: { status: IssueStatus }) {
-  const Icon = statusIcon[status];
+  const label = STATUS_LABELS[status] ?? status;
+  const Icon = statusIcon[status] ?? Circle;
+  const style = STATUS_STYLES[status] ?? STATUS_STYLES.REPORTED;
   return (
     <span
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold",
-        STATUS_STYLES[status],
+        style,
       )}
     >
       <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-      {STATUS_LABELS[status]}
+      {label}
     </span>
   );
 }

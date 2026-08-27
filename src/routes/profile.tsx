@@ -25,7 +25,7 @@ function ProfilePage() {
     await queryClient.cancelQueries();
     queryClient.clear();
     signOut();
-    navigate({ to: "/login", replace: true });
+    navigate({ to: "/home", replace: true });
   }
 
   return (
