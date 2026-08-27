@@ -123,23 +123,6 @@ export const issueService = {
       },
       () => localStore.issues().find((i) => i.ticketId === ticketId) ?? null,
     ),
-  validateLocation: (coords: { lat: number; lng: number } | null) =>
-    withFallback<{ allowed: boolean; message?: string }>(
-      async () => {
-        if (!coords) {
-          return { allowed: false, message: "GPS coordinates required" };
-        }
-        const { data } = await api.post("/issues/validate-location", {
-          latitude: coords.lat,
-          longitude: coords.lng,
-        });
-        return {
-          allowed: data.allowed,
-          message: data.reason ?? data.message,
-        };
-      },
-      () => ({ allowed: true }),
-    ),
   aiSuggest: (payload: { title: string; description: string; imageCount: number }) =>
     withFallback<AiSuggestion | null>(
       async () => {

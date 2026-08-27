@@ -128,12 +128,6 @@ function ReportPage() {
   async function startSubmit() {
     setSubmitting(true);
     try {
-      const validation = await issueService.validateLocation(draft.gps);
-      if (!validation.allowed) {
-        toast.error("Issue reporting is available only within the authorized campus area.");
-        setSubmitting(false);
-        return;
-      }
       const dup = await issueService.checkDuplicate({
         title: draft.title,
         category: draft.category,

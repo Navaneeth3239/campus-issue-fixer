@@ -26,9 +26,7 @@ PAGES / SCREENS
    - Optional video upload
    - Location: auto-capture GPS (browser Geolocation API) + dropdown of predefined locations (Block A, Block B, Laboratory, Library, Hostel, Canteen, Playground, Parking Area)
    - Priority selector (LOW/MEDIUM/HIGH) with inline explanation text for each level
-   - On submit: call location-validation endpoint first; if outside campus, block and show "Issue reporting is available only within the authorized campus area."
-   - If AI suggestion returned after image upload, show a suggestion card with Accept / Edit / Ignore actions (never auto-apply)
-   - Before final save, call duplicate-check endpoint; if a match is found, show the existing ticket (ID, title, location, status, date) with two buttons: "Follow Existing Issue" or "Report as Separate Issue"
+   - On submit: run duplicate-check; if a match is found, show the existing ticket (ID, title, location, status, date) with two buttons: "Follow Existing Issue" or "Report as Separate Issue"
    - On success, show ticket confirmation screen with generated ticket ID format CS-YYYY-XXXXX
 6. My Issues — list submitted + followed issues, filter by status
 7. Issue Detail — full ticket info, images, vertical status timeline (✓ Reported → ✓ Assigned → ● In Progress → ○ Resolved → ○ Verified → ○ Closed), each step shows date/time/action/department/comment, live-updates via Socket.IO (join room issue:{ticketId}, listen for issueStatusChanged, issueUpdated, issueResolved — no manual refresh needed)
